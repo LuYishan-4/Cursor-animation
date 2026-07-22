@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include "Quick/PluginPath/PluginPath.hpp"
+#include <algorithm>
 
 namespace fs = std::filesystem;
 
@@ -40,8 +41,7 @@ bool UserConfig::load(){
         //inital start config
         data_["html"] = g_htmlInitialPath.string();
         data_["sdk"]  =  g_sdkInitialPath.string();
-
-        
+        data_["blacklist"] = "";
         return save();
     }
 
@@ -99,5 +99,73 @@ std::string UserConfig::readKeyValue(const std::string& key) const{
 
     return it->second;
 }
+std::vector<std::string>UserConfig::getBlacklist() const{
+    std::vector<std::string> result;
+    auto it = data_.find("blacklist");
+    if(it == data_.end() || it->second.empty())
+        return result;
 
+
+
+    std::stringstream ss(it->second);
+
+    std::string item;
+
+
+    while(std::getline(ss, item, ','))
+    {
+        if(!item.empty())
+            result.push_back(item);
+    }
+
+
+    return result;
+}
+
+
+
+
+
+void UserConfig::appendBlacklist(const std::string& app) {
+    if (app.empty()) return;
+
+    std::string current_list = data_["blacklist"]; 
+
+    if (current_list.empty()) {
+        data_["blacklist"] = app; 
+        save();
+        return;
+    }
+
+    size_t pos = current_list.find(app);
+    while (pos != std::string::npos) {
+        bool match_start = (pos == 0 || current_list[pos - 1] == ',');
+        bool match_end = (pos + app.length() == current_list.length() || current_list[pos + app.length()] == ',');
+        
+        if (match_start && match_end) {
+            return; 
+        }
+        pos = current_list.find(app, pos + 1);
+    }
+    current_list += "," + app;
+    data_["blacklist"] = current_list; 
+    save();
+}
+
+void UserConfig::removeBlacklist(const std::string& app){
+    std::string current_list = data_["blacklist"];
+    if (current_list.empty()) return;
+
+    std::string new_value;
+    std::string token;
+    std::stringstream ss(current_list);
+
+    while (std::getline(ss, token, ',')) {
+        if (token == app) continue; 
+        if (!new_value.empty())new_value += ",";
+        new_value += token;
+    }
+    data_["blacklist"] = new_value;
+    save();
+}
 } // namespace UltralightWebCursorM

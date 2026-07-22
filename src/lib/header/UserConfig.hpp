@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <filesystem>
+#include <vector>
 
 
 namespace UltralightWebCursorM
@@ -54,6 +55,11 @@ public:
      * @return The value associated with the key, or the default value.
      */
     std::string readKeyValue(const std::string& key) const;
+
+    std::vector<std::string> getBlacklist() const;
+    void appendBlacklist(const std::string& key);
+    void removeBlacklist(const std::string& key);
+
 
 private:
     std::string configPath_;                            // Full path of the configuration file.
