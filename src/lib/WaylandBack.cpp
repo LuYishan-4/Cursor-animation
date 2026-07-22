@@ -8,7 +8,7 @@
 #include <sys/syscall.h>
 
 
-namespace CursorFX
+namespace UltralightWebCursorM
 {
 
 

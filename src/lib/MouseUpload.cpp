@@ -5,7 +5,7 @@
 #include <iostream>
 
 
-namespace CursorFX
+namespace UltralightWebCursorM
 {
 
 

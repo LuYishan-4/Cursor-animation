@@ -3,7 +3,7 @@
 #include <memory>
 
 
-namespace CursorFX
+namespace UltralightWebCursorM
 {
 
 

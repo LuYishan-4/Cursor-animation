@@ -99,10 +99,10 @@ private:
 private:
 
 
-    std::unique_ptr<CursorFX::UltralightHtmlEffect> m_html;
+    std::unique_ptr<UltralightWebCursorM::UltralightHtmlEffect> m_html;
 
 
-    std::unique_ptr<CursorFX::IMouseProvider> m_mouseProvider;
+    std::unique_ptr<UltralightWebCursorM::IMouseProvider> m_mouseProvider;
 
 
 

@@ -12,7 +12,7 @@ namespace KWin
 
 class KwinMouseProvider :
     public QObject,
-    public CursorFX::IMouseProvider
+    public UltralightWebCursorM::IMouseProvider
 {
     Q_OBJECT
 

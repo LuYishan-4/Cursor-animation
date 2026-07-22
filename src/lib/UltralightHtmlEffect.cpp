@@ -2,162 +2,37 @@
 
 #include <Ultralight/Ultralight.h>
 #include <AppCore/Platform.h>
-
+#include "UltralightPl/WebListener.hpp"
 #include <iostream>
 #include <fstream>
 #include <cstring>
 
 
-namespace CursorFX
+namespace UltralightWebCursorM
 {
 
+UltralightHtmlEffect::UltralightHtmlEffect(){}
 
-class LocalLoadListener :
-    public ultralight::LoadListener
-{
-
-public:
-
-    explicit LocalLoadListener(bool* flag)
-        :
-        loaded_(flag)
-    {
-    }
-
-
-
-    void OnFinishLoading(
-        ultralight::View*,
-        uint64_t,
-        bool main_frame,
-        const ultralight::String& url
-    ) override
-    {
-
-        if(main_frame)
-        {
-
-            std::cout
-                << "[Ultralight] loaded "
-                << url.utf8().data()
-                << "\n";
-
-
-            *loaded_ = true;
-
-        }
-
-    }
-
-
-
-    void OnFailLoading(
-        ultralight::View*,
-        uint64_t,
-        bool main_frame,
-        const ultralight::String& url,
-        const ultralight::String& desc,
-        const ultralight::String&,
-        int
-    ) override
-    {
-
-        if(main_frame)
-        {
-
-            std::cerr
-                << "[Ultralight] load failed "
-                << url.utf8().data()
-                << " "
-                << desc.utf8().data()
-                << "\n";
-
-
-            *loaded_ = false;
-
-        }
-
-    }
-
-
-private:
-
-    bool* loaded_;
-
-};
-
-
-
-
-
-
-UltralightHtmlEffect::UltralightHtmlEffect()
-{
-
-}
-
-
-
-
-UltralightHtmlEffect::~UltralightHtmlEffect()
-{
-
-    std::cout
-        << "[Ultralight] destroy\n";
-
-
+UltralightHtmlEffect::~UltralightHtmlEffect(){
+    std::cout<< "[Ultralight] destroy\n";
     listener_.reset();
-
-
     view_ = nullptr;
-
-
     renderer_ = nullptr;
-
-
 }
 
 
-
-
-
-
-
-bool UltralightHtmlEffect::initialize(
-    const std::string& path,
-    const std::string& sdk
-)
-{
-
-    std::cout
-        << "[Ultralight] init\n";
-
-
-
+//initialize
+bool UltralightHtmlEffect::initialize( const std::string& path,const std::string& sdk){
     ultralight::Config config;
-
-
     config.resource_path_prefix =
         ultralight::String(
             "resources/"
         );
-
-
-
-    auto& platform =
-        ultralight::Platform::instance();
-
-
-
+    auto& platform =ultralight::Platform::instance();
     platform.set_config(config);
-
-
-
     platform.set_font_loader(
         ultralight::GetPlatformFontLoader()
     );
-
-
 
     platform.set_file_system(
         ultralight::GetPlatformFileSystem(
@@ -166,35 +41,11 @@ bool UltralightHtmlEffect::initialize(
             )
         )
     );
-
-
-
-
-
-    renderer_ =
-        ultralight::Renderer::Create();
-
-
-
-    if(!renderer_)
-    {
-
-        std::cerr
-            << "[Ultralight] renderer fail\n";
-
-        return false;
-
-    }
-
-
-
-
+    renderer_ =ultralight::Renderer::Create();
+    if(!renderer_) return false;
 
     ultralight::ViewConfig vc;
-
-
     vc.is_transparent = true;
-
 
     view_ =
         renderer_->CreateView(
@@ -203,103 +54,33 @@ bool UltralightHtmlEffect::initialize(
             vc,
             nullptr
         );
+    html_path_ = path;
+    if(!view_)return false;
 
+    listener_ =std::make_unique<LocalLoadListener>(is_loaded_);
 
+    view_->set_load_listener(listener_.get());
 
-    if(!view_)
-        return false;
-
-
-
-
-    listener_ =
-        std::make_unique<LocalLoadListener>(
-            &is_loaded_
-        );
-
-
-
-    view_->set_load_listener(
-        listener_.get()
-    );
-
-
-
-    html_path_ =
-        path;
-
-
-
-    if(std::filesystem::exists(html_path_))
-    {
-
-        html_time_ =
-            std::filesystem::last_write_time(
-                html_path_
-            );
-
-    }
-
-
-
+    if(std::filesystem::exists(html_path_ )) html_time_ =std::filesystem::last_write_time(html_path_ );
+    
     return load(path);
-
 }
 
 
-
-
-
-
-
-
-
-bool UltralightHtmlEffect::load(
-    const std::string& path
-)
-{
-
-
+bool UltralightHtmlEffect::load(const std::string& path){
     std::ifstream file(path);
-
-
-    if(!file)
-    {
-
-        std::cerr
-            << "[Ultralight] cannot open html\n";
-
-        return false;
-
-    }
-
-
-
+    if(!file)return false;
 
     std::string html(
         (std::istreambuf_iterator<char>(file)),
         std::istreambuf_iterator<char>()
     );
 
-
-
-
     std::filesystem::path p(path);
 
-
-
-    std::string base =
-        "file://" +
-        p.parent_path().string()
-        +
-        "/";
-
-
-
+    std::string base ="file://" +p.parent_path().string()+"/";
 
     is_loaded_ = false;
-
-
 
     view_->LoadHTML(
         ultralight::String(
@@ -309,50 +90,19 @@ bool UltralightHtmlEffect::load(
             base.c_str()
         )
     );
-
-
-
     view_->set_needs_paint(true);
-
-
-
     return true;
-
 }
 
+void UltralightHtmlEffect::reload(){
+    if(html_path_.empty())return;
+
+    if(!std::filesystem::exists(html_path_))return;
 
 
+    auto now =std::filesystem::last_write_time( html_path_);
 
-
-
-
-
-
-void UltralightHtmlEffect::reload()
-{
-
-    if(html_path_.empty())
-        return;
-
-
-
-    if(!std::filesystem::exists(html_path_))
-        return;
-
-
-
-
-    auto now =
-        std::filesystem::last_write_time(
-            html_path_
-        );
-
-
-
-    if(now != html_time_)
-    {
-        std::cout
-            << "[Ultralight] reload html\n";
+    if(now != html_time_){
         html_time_ = now;
         load(
             html_path_.string()
@@ -393,19 +143,12 @@ void UltralightHtmlEffect::update(){
     auto surface =  view_->surface();
     if(!surface)return;
 
-    auto bitmap_surface =
-        dynamic_cast<ultralight::BitmapSurface*>(
-            surface
-        );
-    if(!bitmap_surface)
-        return;
+    auto bitmap_surface =dynamic_cast<ultralight::BitmapSurface*>(surface);
+    if(!bitmap_surface)return;
 
-    auto bitmap =
-        bitmap_surface->bitmap();
+    auto bitmap =bitmap_surface->bitmap();
 
-    if(!bitmap)
-        return;
-
+    if(!bitmap) return;
     bitmap->LockPixels();
     uint8_t* raw =
         static_cast<uint8_t*>(
@@ -428,16 +171,9 @@ void UltralightHtmlEffect::update(){
             raw,
             size
         );
-
-
-
         new_frame_ = true;
-
-
     }
-
     bitmap->UnlockPixels();
-
 }
 void UltralightHtmlEffect::setEnabled(
     bool enabled
@@ -450,19 +186,9 @@ bool UltralightHtmlEffect::isEnabled() const{
     return enabled_;
 }
 
-
-
-
-
-
 bool UltralightHtmlEffect::hasNewFrame() const{
     return new_frame_;
 }
-
-
-
-
-
 
 void UltralightHtmlEffect::clearNewFrame(){
     new_frame_ = false;

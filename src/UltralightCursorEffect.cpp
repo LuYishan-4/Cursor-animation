@@ -45,10 +45,10 @@ UltralightCursorEffect::UltralightCursorEffect()
 
     m_html =
         std::make_unique<
-            CursorFX::UltralightHtmlEffect
+            UltralightWebCursorM::UltralightHtmlEffect
         >();
 
-    CursorFX::UserConfig config;
+    UltralightWebCursorM::UserConfig config;
     config.load();
 
     auto base =
@@ -111,7 +111,7 @@ UltralightCursorEffect::UltralightCursorEffect()
 
 
     m_mouseProvider->setCallback(
-        [this](const CursorFX::MousePoint& pt)
+        [this](const UltralightWebCursorM::MousePoint& pt)
         {
 
             if(!m_html)

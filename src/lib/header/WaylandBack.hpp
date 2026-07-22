@@ -5,7 +5,7 @@
 #include <wayland-client.h>
 
 
-namespace CursorFX
+namespace UltralightWebCursorM
 {
 
 

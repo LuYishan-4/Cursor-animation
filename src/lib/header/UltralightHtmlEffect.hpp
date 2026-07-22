@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Ultralight/Ultralight.h>
+#include <AppCore/AppCore.h>
 
 #include <filesystem>
 #include <memory>
@@ -8,7 +9,7 @@
 #include <string>
 
 
-namespace CursorFX
+namespace UltralightWebCursorM
 {
 
 
@@ -42,19 +43,13 @@ public:
         bool pressed
     );
 
+
     void reload();
 
-    void setEnabled(bool enabled);
-
-    bool isEnabled() const;
-
-
-    bool hasNewFrame() const;
-
-    void clearNewFrame();
 
 
     const uint8_t* pixels() const;
+
 
 
     int width() const
@@ -76,6 +71,22 @@ public:
 
 
 
+    // 開關效果
+    void setEnabled(bool enabled);
+
+
+    bool isEnabled() const;
+
+
+
+    // 避免每 frame upload
+    bool hasNewFrame() const;
+
+
+    void clearNewFrame();
+
+
+
 private:
 
 
@@ -92,19 +103,17 @@ private:
     bool is_loaded_ = false;
 
 
-
-    // 是否執行 Ultralight
     bool enabled_ = true;
 
 
-    // bitmap 是否更新
     bool new_frame_ = false;
 
 
 
-    int width_ = 64;
+    // cursor size
+    int width_ = 128;
 
-    int height_ = 64;
+    int height_ = 128;
 
     int stride_ = 0;
 

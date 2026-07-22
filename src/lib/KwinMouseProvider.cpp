@@ -48,7 +48,7 @@ void KwinMouseProvider::slotMouseChanged(
     if(!callback_)
         return;
 
-    CursorFX::MousePoint pt;
+    UltralightWebCursorM::MousePoint pt;
 
     pt.x = static_cast<int>(pos.x());
     pt.y = static_cast<int>(pos.y());

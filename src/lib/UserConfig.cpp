@@ -9,14 +9,12 @@
 namespace fs = std::filesystem;
 
 
-namespace CursorFX
+namespace UltralightWebCursorM
 {
 
 
-UserConfig::UserConfig()
-{
+UserConfig::UserConfig(){
     const char* home = std::getenv("HOME");
-
     if(home)
     {
         configPath_ = std::string(home) + "/.config/cursorfx/config.ini";

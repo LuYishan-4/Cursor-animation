@@ -1,15 +1,11 @@
 {
     "KPlugin": {
-        "Name": "UltralightCursor",
-        "Description": "Ultralight HTML Cursor Effect",
-        "Version": "1.0",
-        "License": "GPL-3.0",
-        "Category": "Appearance",
-        "EnabledByDefault": false
+        "Id": "ultralightcursor",
+        "Name": "Ultralight Cursor",
+        "Description": "HTML based cursor",
+        "License": "GPL"
     },
-    "X-KDE-PluginInfo-Name": "ultralightcursor",
     "X-KDE-ServiceTypes": [
         "KWin/Effect"
-    ],
-    "X-KDE-Library": "ultralightcursor"
+    ]
 }
