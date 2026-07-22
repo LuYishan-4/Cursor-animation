@@ -111,7 +111,7 @@ install(
 )
 install(
     FILES WebCursor/index.html
-    DESTINATION ${CMAKE_INSTALL_DATADIR}/kwin/effects/ultralightcursor/sdk/ultralight-free-sdk-1.4.0-linux-x64/resources/
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/kwin/effects/ultralightcursor/sdk/ultralight-free-sdk-1.4.0-linux-x64/resources/default/
 )
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY

@@ -170,32 +170,16 @@ public:
 
 
 
-signals:
-
-
-    void htmlPathChanged();
-
-    void sdkPathChanged();
-
-    void enabledChanged();
-
-    void statusMessageChanged();
-
-
-
-    void blacklistChanged();
-
-
-    void themeListChanged();
-
-
-    void currentThemeChanged();
-
-
+   Q_SIGNALS:
+         void htmlPathChanged();
+        void sdkPathChanged();
+        void enabledChanged();
+        void statusMessageChanged();
+        void blacklistChanged();
+        void themeListChanged();
+        void currentThemeChanged();
 
 private:
-
-
     void setStatusMessage(
         const QString&
     );

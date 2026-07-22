@@ -32,15 +32,14 @@ bool UserConfig::load(){
         "ultralight-free-sdk-1.4.0-linux-x64";
    g_htmlInitialPath =
         g_sdkInitialPath /
-        "resources" /
-         "default"/
-        "index.html";
+        "resources";
+
     data_.clear();
     if(configPath_.empty()) return false;
     std::ifstream file(configPath_);
     if(!file.is_open()){
         //inital start config
-        data_["html"] = g_htmlInitialPath.string();
+        data_["html"] = g_htmlInitialPath/  "default"/ "index.html";
         data_["sdk"]  =  g_sdkInitialPath.string();
         data_["blacklist"] = "";
         return save();
@@ -194,5 +193,17 @@ bool UserConfig::uploadTheme(const std::string& path,const std::string& themeNam
 
     return true;
 }
-
+std::string UserConfig::currentTheme() const{
+    auto it = data_.find("html");
+    if(it == data_.end() || it->second.empty()){
+        return "default";
+    }
+    std::filesystem::path htmlPath =
+        it->second;
+    auto themePath =htmlPath.parent_path();
+    if(themePath.filename().empty()){
+        return "default";
+    }
+    return themePath.filename().string();
+}
 }
