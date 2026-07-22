@@ -1,30 +1,37 @@
 #include "SettingsBackend.hpp"
 
-#include <QDBusInterface>
-#include <QDBusReply>
+
 #include <QFileInfo>
+#include <QDir>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QDBusInterface>
+#include <QDBusConnection>
 
 
-SettingsBackend::SettingsBackend(QObject* parent)
+#include <filesystem>
+
+
+
+using namespace UltralightWebCursorM;
+
+
+
+SettingsBackend::SettingsBackend(
+    QObject* parent
+)
     : QObject(parent)
 {
     reload();
 }
 
 
+
+
+
 QString SettingsBackend::htmlPath() const
 {
     return htmlPath_;
-}
-
-
-void SettingsBackend::setHtmlPath(const QString& path)
-{
-    if(htmlPath_ == path)
-        return;
-
-    htmlPath_ = path;
-    Q_EMIT htmlPathChanged();
 }
 
 
@@ -34,30 +41,12 @@ QString SettingsBackend::sdkPath() const
 }
 
 
-void SettingsBackend::setSdkPath(const QString& path)
-{
-    if(sdkPath_ == path)
-        return;
-
-    sdkPath_ = path;
-    Q_EMIT sdkPathChanged();
-}
-
 
 bool SettingsBackend::enabled() const
 {
     return enabled_;
 }
 
-
-void SettingsBackend::setEnabled(bool value)
-{
-    if(enabled_ == value)
-        return;
-
-    enabled_ = value;
-    Q_EMIT enabledChanged();
-}
 
 
 QString SettingsBackend::statusMessage() const
@@ -66,116 +55,560 @@ QString SettingsBackend::statusMessage() const
 }
 
 
-void SettingsBackend::setStatusMessage(const QString& message)
+
+
+QStringList SettingsBackend::blacklist() const
 {
-    statusMessage_ = message;
-    Q_EMIT statusMessageChanged();
+    return blacklist_;
 }
 
 
-void SettingsBackend::save()
+
+
+QStringList SettingsBackend::themeList() const
 {
-    config_.setKeyValue("html",htmlPath_.toStdString());
-    config_.setKeyValue("sdk",sdkPath_.toStdString());
-
-
-    if(config_.save())
-    {
-        setStatusMessage(QStringLiteral("已儲存設定"));
-    }
-    else
-    {
-        setStatusMessage(QStringLiteral("儲存失敗，請檢查權限"));
-    }
+    return themeList_;
 }
+
+
+
+
+QString SettingsBackend::currentTheme() const
+{
+    return currentTheme_;
+}
+
+
+
+
+
+void SettingsBackend::setHtmlPath(
+    const QString& path
+)
+{
+    if(htmlPath_==path)
+        return;
+
+
+    htmlPath_=path;
+
+    emit htmlPathChanged();
+}
+
+
+
+
+
+void SettingsBackend::setSdkPath(
+    const QString& path
+)
+{
+    if(sdkPath_==path)
+        return;
+
+
+    sdkPath_=path;
+
+    emit sdkPathChanged();
+}
+
+
+
+
+void SettingsBackend::setEnabled(
+    bool value
+)
+{
+    if(enabled_==value)
+        return;
+
+
+    enabled_=value;
+
+    emit enabledChanged();
+}
+
+
+
+
+
+
+
+void SettingsBackend::setStatusMessage(
+    const QString& msg
+)
+{
+    statusMessage_=msg;
+
+    emit statusMessageChanged();
+}
+
+
+
+
 
 
 void SettingsBackend::reload()
 {
+
     config_.load();
 
-    htmlPath_ = QString::fromStdString(config_.readKeyValue("html"));
-    sdkPath_ = QString::fromStdString(config_.readKeyValue("sdk"));
-    enabled_ = true;
 
-    Q_EMIT htmlPathChanged();
-    Q_EMIT sdkPathChanged();
-    Q_EMIT enabledChanged();
+    htmlPath_ =
+        QString::fromStdString(
+            config_.readKeyValue("html")
+        );
 
-    setStatusMessage(QStringLiteral("重新載入"));
+
+    sdkPath_ =
+        QString::fromStdString(
+            config_.readKeyValue("sdk")
+        );
+
+
+
+    blacklist_.clear();
+
+
+    for(auto& i:
+        config_.getBlacklist())
+    {
+        blacklist_
+            << QString::fromStdString(i);
+    }
+
+
+
+    currentTheme_ =
+        QString::fromStdString(
+            config_.readKeyValue(
+                "theme"
+            )
+        );
+
+
+
+    loadThemes();
+
+
+
+    emit htmlPathChanged();
+
+    emit sdkPathChanged();
+
+    emit blacklistChanged();
+
+    emit currentThemeChanged();
+
+
+    setStatusMessage(
+        "Reload"
+    );
 }
 
 
-void SettingsBackend::reconfigureKWin()
+
+
+
+
+
+
+
+void SettingsBackend::save()
 {
-    QDBusInterface kwin(
-        QStringLiteral("org.kde.KWin"),
-        QStringLiteral("/KWin"),
-        QStringLiteral("org.kde.KWin")
+
+    config_.setKeyValue(
+        "html",
+        htmlPath_.toStdString()
     );
 
-    if(!kwin.isValid())
-    {
-        return;
-    }
 
-    QDBusReply<void> reply = kwin.call(QStringLiteral("reconfigure"));
+    config_.setKeyValue(
+        "sdk",
+        sdkPath_.toStdString()
+    );
 
-    if(reply.isValid())
-    {
-        setStatusMessage(QStringLiteral("reload"));
-    }
+
+    config_.setKeyValue(
+        "theme",
+        currentTheme_.toStdString()
+    );
+
+
+
+    if(config_.save())
+
+        setStatusMessage(
+            "Saved"
+        );
+
     else
-    {
-        setStatusMessage(QStringLiteral("failed: ") + reply.error().message());
-    }
+
+        setStatusMessage(
+            "Save failed"
+        );
 }
 
 
-bool SettingsBackend::pathExists(const QString& path) const
+
+
+
+
+
+
+
+void SettingsBackend::addBlacklist(
+    const QString& app
+)
+{
+
+    config_.appendBlacklist(
+        app.toStdString()
+    );
+
+
+    reload();
+
+}
+
+
+
+
+
+
+
+void SettingsBackend::removeBlacklist(
+    const QString& app
+)
+{
+
+    config_.removeBlacklist(
+        app.toStdString()
+    );
+
+
+    reload();
+
+}
+
+
+
+
+
+
+
+
+
+void SettingsBackend::loadThemes()
+{
+
+    themeList_.clear();
+
+
+
+    std::filesystem::path path =
+        g_sdkInitialPath /
+        "resources";
+
+
+
+    if(!std::filesystem::exists(path))
+        return;
+
+
+
+    for(auto& item:
+        std::filesystem::directory_iterator(path))
+    {
+
+        if(item.is_directory())
+        {
+
+            themeList_
+                <<
+                QString::fromStdString(
+                    item.path()
+                    .filename()
+                    .string()
+                );
+
+        }
+
+    }
+
+
+    emit themeListChanged();
+
+}
+
+
+
+
+
+
+
+
+
+bool SettingsBackend::uploadTheme(
+    const QString& folder
+)
+{
+
+    QFileInfo info(folder);
+
+
+    if(!info.exists())
+    {
+        setStatusMessage(
+            "Folder not found"
+        );
+
+        return false;
+    }
+
+
+
+    QString name =
+        info.fileName();
+
+
+
+    QDir dest(
+        QString::fromStdString(
+            (
+                g_sdkInitialPath /
+                "resources"
+            ).string()
+        )
+    );
+
+
+
+    if(dest.exists(name))
+    {
+
+        setStatusMessage(
+            "Theme already exists"
+        );
+
+        return false;
+    }
+
+
+
+    QDir().mkpath(
+        dest.absolutePath()
+    );
+
+
+
+    dest.mkdir(name);
+
+
+
+    QDir source(folder);
+
+
+    for(auto file:
+        source.entryList(
+            QDir::Files
+        ))
+    {
+
+        QFile::copy(
+            source.filePath(file),
+            dest.filePath(
+                name+"/"+file
+            )
+        );
+
+    }
+
+
+
+    loadThemes();
+
+
+    setStatusMessage(
+        "Theme uploaded"
+    );
+
+
+    return true;
+
+}
+
+
+
+
+
+
+
+
+
+void SettingsBackend::useTheme(
+    const QString& name
+)
+{
+
+    currentTheme_=name;
+
+
+    emit currentThemeChanged();
+
+
+    save();
+
+
+}
+
+
+
+
+
+
+
+
+
+void SettingsBackend::removeTheme(
+    const QString& name
+)
+{
+
+    std::filesystem::remove_all(
+        g_sdkInitialPath /
+        "resources" /
+        name.toStdString()
+    );
+
+
+    loadThemes();
+
+}
+
+
+
+
+
+
+
+
+void SettingsBackend::openThemeFolder(
+    const QString& name
+)
+{
+
+    auto path =
+        QString::fromStdString(
+            (
+                g_sdkInitialPath /
+                "resources" /
+                name.toStdString()
+            ).string()
+        );
+
+
+    QDesktopServices::openUrl(
+        QUrl::fromLocalFile(path)
+    );
+
+}
+
+
+
+
+
+
+
+
+
+bool SettingsBackend::pathExists(
+    const QString& path
+) const
 {
     return QFileInfo::exists(path);
 }
 
 
+
+
+
+
+
+
 void SettingsBackend::enable()
 {
+
     QDBusInterface kwin(
-        QStringLiteral("org.kde.KWin"),
-        QStringLiteral("/Effects"),
-        QStringLiteral("org.kde.kwin.Effects"),
+        "org.kde.KWin",
+        "/Effects",
+        "org.kde.kwin.Effects",
         QDBusConnection::sessionBus()
     );
 
+
     kwin.call(
-        QStringLiteral("loadEffect"),
-        QStringLiteral("ultralightcursor")
+        "loadEffect",
+        "ultralightcursor"
     );
 
-    setStatusMessage(QStringLiteral("已啟用特效"));
+
 }
+
+
+
+
+
 
 
 void SettingsBackend::disable()
 {
+
     QDBusInterface kwin(
-        QStringLiteral("org.kde.KWin"),
-        QStringLiteral("/Effects"),
-        QStringLiteral("org.kde.kwin.Effects"),
+        "org.kde.KWin",
+        "/Effects",
+        "org.kde.kwin.Effects",
         QDBusConnection::sessionBus()
     );
 
+
     kwin.call(
-        QStringLiteral("unloadEffect"),
-        QStringLiteral("ultralightcursor")
+        "unloadEffect",
+        "ultralightcursor"
     );
 
-    setStatusMessage(QStringLiteral("已關閉特效"));
 }
+
+
+
+
+
 
 
 void SettingsBackend::reloadHtml()
 {
     save();
     reconfigureKWin();
+}
+
+
+
+
+
+
+
+void SettingsBackend::reconfigureKWin()
+{
+
+    QDBusInterface kwin(
+        "org.kde.KWin",
+        "/KWin",
+        "org.kde.KWin"
+    );
+
+
+    kwin.call(
+        "reconfigure"
+    );
+
 }

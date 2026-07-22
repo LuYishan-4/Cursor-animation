@@ -59,6 +59,7 @@ public:
     std::vector<std::string> getBlacklist() const;
     void appendBlacklist(const std::string& key);
     void removeBlacklist(const std::string& key);
+    bool uploadTheme( const std::string& srcPath,const std::string& themeName);
 
 
 private:

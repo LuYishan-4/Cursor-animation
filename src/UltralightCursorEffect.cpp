@@ -1,5 +1,4 @@
 #include "lib/header/UltralightCursorEffect.hpp"
-
 #include "lib/header/KwinMouseProvider.hpp"
 
 
@@ -31,6 +30,7 @@ KWIN_EFFECT_FACTORY_SUPPORTED(
 
 UltralightCursorEffect::UltralightCursorEffect()
 {
+    
     std::cout
         << "[UltralightCursorEffect] constructor\n";
     m_html =
@@ -41,6 +41,10 @@ UltralightCursorEffect::UltralightCursorEffect()
     config.load();
     auto html = config.readKeyValue("html");
     auto sdk = config.readKeyValue("sdk");
+    auto blacklist = config.getBlacklist();
+    m_blacklist.setBlacklist(config.getBlacklist());
+
+
 
     config.save();
 
@@ -119,8 +123,14 @@ QDBusConnection::sessionBus().registerObject(
 
         effects->addRepaintFull();
 
-      
     }
+
+    bool UltralightCursorEffect::isBlacklisted() const {
+         auto window = effects->activeWindow();
+          if(!window) return false;
+           QString app = window->windowClass();
+            return m_blacklist.contains( app.toStdString() );
+     }
 
     GLTexture* UltralightCursorEffect::ensureCursorTexture(){
         if(!m_html ||!m_html->isEnabled())return nullptr;
@@ -169,6 +179,7 @@ QDBusConnection::sessionBus().registerObject(
             region,
             screen
         );
+        if(isBlacklisted()) return;
 
         if (screen && !screen->geometry().contains(effects->cursorPos().toPoint())) return;
         

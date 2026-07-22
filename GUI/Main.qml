@@ -3,176 +3,304 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 
-
 ApplicationWindow {
     id: root
-
-    width: 520
-    height: 360
+    width: 700
+    height: 520
     visible: true
-    title: qsTr("UltralightWebCursor-GUI")
+    title: qsTr("CursorFX Settings")
 
-
-    FileDialog {
-        id: htmlFileDialog
-        title: qsTr("Choose HTML")
-        nameFilters: ["HTML files (*.html *.htm)"]
-        onAccepted: {
-            backend.htmlPath = htmlFileDialog.selectedFile.toString().replace("file://", "")
-        }
-    }
-
+    // Folder Dialog for Theme Upload
     FolderDialog {
-        id: sdkFolderDialog
-        title: qsTr("Choose Ultralight SDK ")
+        id: themeUploadDialog
+        title: qsTr("Choose Theme Folder")
         onAccepted: {
-            backend.sdkPath = sdkFolderDialog.selectedFolder.toString().replace("file://", "")
+            backend.uploadTheme(selectedFolder.toString().replace("file://", ""))
         }
     }
 
-
-    ColumnLayout {
+    Page {
         anchors.fill: parent
-        anchors.margins: 20
-        spacing: 16
 
-        Label {
-            text: qsTr("Animation-Setting")
-            font.pixelSize: 20
-            font.bold: true
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-
-            Label {
-                text: qsTr("Enable animation")
-                Layout.fillWidth: true
-            }
-
-            Switch {
-                checked: backend.enabled
-                onToggled: {
-                    if(checked)
-                        backend.enable()
-                    else
-                        backend.disable()
-                }
-            }
-        }
-
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 4
-
-            Label {
-                text: qsTr("HTML Path徑")
-                font.bold: true
-            }
+        // Top Navigation Bar with Header & GitHub Icon
+        header: ToolBar {
+            contentHeight: tabBar.height
 
             RowLayout {
-                Layout.fillWidth: true
+                anchors.fill: parent
+                anchors.leftMargin: 12
+                anchors.rightMargin: 12
 
-                TextField {
-                    id: htmlPathField
+                TabBar {
+                    id: tabBar
                     Layout.fillWidth: true
-                    text: backend.htmlPath
-                    placeholderText: qsTr("not setting")
-                    onEditingFinished: backend.htmlPath = text
+                    background: Rectangle { color: "transparent" }
 
-                    color: backend.pathExists(text) ? "black" : "red"
+                    TabButton { text: qsTr("Theme") }
+                    TabButton { text: qsTr("Blacklist") }
+                    TabButton { text: qsTr("Setting") }
                 }
 
-                Button {
-                    text: qsTr("find")
-                    onClicked: htmlFileDialog.open()
-                }
-            }
+                // GitHub Icon Button
+                ToolButton {
+                    id: githubButton
+                    Layout.preferredWidth: 36
+                    Layout.preferredHeight: 36
+                    
+                    contentItem: Image {
+                        source: "assets/github.svg"
+                        fillMode: Image.PreserveAspectFit
+                        anchors.centerIn: parent
+                        sourceSize.width: 24
+                        sourceSize.height: 24
+                    }
 
-            Label {
-                visible: htmlPathField.text.length > 0 && !backend.pathExists(htmlPathField.text)
-                text: qsTr("cant not find path")
-                color: "red"
-                font.pixelSize: 11
+                    ToolTip.visible: hovered
+                    ToolTip.text: qsTr("Open GitHub Repository")
+
+                    onClicked: {
+                        // Hook your backend or Qt.openUrlExternally here
+                        if (typeof backend.openGitHub === "function") {
+                            backend.openGitHub()
+                        } else {
+                            Qt.openUrlExternally("https://github.com")
+                        }
+                    }
+                }
             }
         }
 
+        StackLayout {
+            anchors.fill: parent
+            currentIndex: tabBar.currentIndex
 
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 4
-
-            Label {
-                text: qsTr("Ultralight SDK path")
-                font.bold: true
-            }
-
-            RowLayout {
-                Layout.fillWidth: true
-
-                TextField {
-                    id: sdkPathField
-                    Layout.fillWidth: true
-                    text: backend.sdkPath
-                    placeholderText: qsTr("not setting")
-                    onEditingFinished: backend.sdkPath = text
-
-                    color: backend.pathExists(text) ? "black" : "red"
-                }
-
-                Button {
-                    text: qsTr("Browse")
-                    onClicked: sdkFolderDialog.open()
-                }
-            }
-
-            Label {
-                visible: sdkPathField.text.length > 0 && !backend.pathExists(sdkPathField.text)
-                text: qsTr("not find")
-                color: "red"
-                font.pixelSize: 11
-            }
-        }
-
-        Item {
-            Layout.fillHeight: true
-        }
-
-        Label {
-            text: backend.statusMessage
-            color: "gray"
-            font.pixelSize: 12
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 8
-
-            Button {
-                text: qsTr("reload")
-                onClicked: backend.reload()
-            }
-
-            Button {
-                text: qsTr("reload HTML")
-                onClicked: backend.reloadHtml()
-            }
-
+            /* =========================================================
+             * 1. Theme Tab
+             * ========================================================= */
             Item {
-                Layout.fillWidth: true
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 20
+                    spacing: 12
+
+                    Label {
+                        text: qsTr("Current Theme")
+                        font.bold: true
+                    }
+
+                    ComboBox {
+                        id: currentThemeBox
+                        Layout.fillWidth: true
+                        model: backend.themeList
+                        currentIndex: backend.themeList.indexOf(backend.currentTheme)
+                        onActivated: {
+                            backend.useTheme(currentText)
+                        }
+                    }
+
+                    Label {
+                        text: qsTr("Installed Themes")
+                        font.bold: true
+                    }
+
+                    ListView {
+                        id: themeList
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        model: backend.themeList
+                        spacing: 6
+
+                        delegate: Rectangle {
+                            width: themeList.width
+                            height: 55
+                            radius: 6
+                            color: backend.currentTheme === modelData ? "#f0f4f8" : "#ffffff"
+                            border.color: "#dcdcdc"
+                            border.width: 1
+
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.margins: 8
+                                spacing: 10
+
+                                RadioButton {
+                                    checked: backend.currentTheme === modelData
+                                    onClicked: backend.useTheme(modelData)
+                                }
+
+                                Label {
+                                    text: modelData
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                }
+
+                                Button {
+                                    text: qsTr("Apply")
+                                    onClicked: backend.useTheme(modelData)
+                                }
+
+                                Button {
+                                    text: qsTr("Open")
+                                    onClicked: backend.openThemeFolder(modelData)
+                                }
+
+                                Button {
+                                    text: qsTr("Delete")
+                                    onClicked: backend.removeTheme(modelData)
+                                }
+                            }
+                        }
+                    }
+
+                    Button {
+                        text: qsTr("Upload Theme")
+                        Layout.alignment: Qt.AlignRight
+                        onClicked: themeUploadDialog.open()
+                    }
+                }
             }
 
-            Button {
-                text: qsTr("save")
-                onClicked: backend.save()
+            /* =========================================================
+             * 2. Blacklist Tab
+             * ========================================================= */
+            Item {
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 20
+                    spacing: 10
+
+                    Label {
+                        text: qsTr("Blacklist")
+                        font.bold: true
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 10
+
+                        TextField {
+                            id: blacklistInput
+                            Layout.fillWidth: true
+                            placeholderText: qsTr("Application name")
+                            onAccepted: addBtn.clicked()
+                        }
+
+                        Button {
+                            id: addBtn
+                            text: qsTr("Add")
+                            onClicked: {
+                                if (blacklistInput.text.length > 0) {
+                                    backend.addBlacklist(blacklistInput.text)
+                                    blacklistInput.clear()
+                                }
+                            }
+                        }
+                    }
+
+                    ListView {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        model: backend.blacklist
+                        spacing: 6
+
+                        delegate: Rectangle {
+                            width: parent.width
+                            height: 45
+                            radius: 6
+                            color: "#ffffff"
+                            border.color: "#dcdcdc"
+                            border.width: 1
+
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.margins: 8
+
+                                Label {
+                                    text: modelData
+                                    Layout.fillWidth: true
+                                    font.pixelSize: 14
+                                }
+
+                                Button {
+                                    text: qsTr("Delete")
+                                    onClicked: backend.removeBlacklist(modelData)
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
-            Button {
-                text: qsTr("save and apply")
-                highlighted: true
-                onClicked: {
-                    backend.save()
-                    backend.reconfigureKWin()
+            /* =========================================================
+             * 3. Setting Tab
+             * ========================================================= */
+            Item {
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 20
+                    spacing: 15
+
+                    Label {
+                        text: qsTr("General")
+                        font.bold: true
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+
+                        Label {
+                            text: qsTr("Enable Animation")
+                            Layout.fillWidth: true
+                        }
+
+                        Switch {
+                            checked: backend.enabled
+                            onToggled: {
+                                if (checked)
+                                    backend.enable()
+                                else
+                                    backend.disable()
+                            }
+                        }
+                    }
+
+                    Label {
+                        text: backend.statusMessage
+                        color: "gray"
+                        font.italic: true
+                    }
+
+                    Item {
+                        Layout.fillHeight: true
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 10
+
+                        Button {
+                            text: qsTr("Reload")
+                            onClicked: backend.reload()
+                        }
+
+                        Button {
+                            text: qsTr("Save")
+                            onClicked: backend.save()
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                        }
+
+                        Button {
+                            highlighted: true
+                            text: qsTr("Apply")
+                            onClicked: {
+                                backend.save()
+                                backend.reconfigureKWin()
+                            }
+                        }
+                    }
                 }
             }
         }

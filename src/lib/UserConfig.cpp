@@ -33,6 +33,7 @@ bool UserConfig::load(){
    g_htmlInitialPath =
         g_sdkInitialPath /
         "resources" /
+         "default"/
         "index.html";
     data_.clear();
     if(configPath_.empty()) return false;
@@ -44,7 +45,7 @@ bool UserConfig::load(){
         data_["blacklist"] = "";
         return save();
     }
-
+ 
     std::string line;
 
     //load to ini
@@ -58,6 +59,9 @@ bool UserConfig::load(){
     }
     return true;
 }
+
+
+
 
 
 bool UserConfig::save()
@@ -105,10 +109,7 @@ std::vector<std::string>UserConfig::getBlacklist() const{
     if(it == data_.end() || it->second.empty())
         return result;
 
-
-
     std::stringstream ss(it->second);
-
     std::string item;
 
 
@@ -168,4 +169,30 @@ void UserConfig::removeBlacklist(const std::string& app){
     data_["blacklist"] = new_value;
     save();
 }
-} // namespace UltralightWebCursorM
+bool UserConfig::uploadTheme(const std::string& path,const std::string& themeName){
+    namespace fs = std::filesystem;
+    fs::path src(path);
+    if(!fs::exists(src))return false;
+    if(!fs::is_directory(src))return false;
+
+    fs::path resources =
+        g_sdkInitialPath /
+        "resources";
+
+    fs::create_directories(resources);
+
+    fs::path dst =resources /themeName;
+
+ 
+    if(fs::exists(dst))return false;
+    
+    fs::copy(
+        src,
+        dst,
+        fs::copy_options::recursive
+    );
+
+    return true;
+}
+
+}
