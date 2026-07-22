@@ -9,32 +9,21 @@ namespace KWin
 {
 
 
-KwinMouseProvider::KwinMouseProvider(QObject* parent)
-    : QObject(parent)
-{
-}
+KwinMouseProvider::KwinMouseProvider(QObject* parent) : QObject(parent){}
 
-
-bool KwinMouseProvider::initialize()
-{
+bool KwinMouseProvider::initialize(){
     connect(
         effects,
         &EffectsHandler::mouseChanged,
         this,
         &KwinMouseProvider::slotMouseChanged
     );
-
-    std::cout << "[KwinMouseProvider][debug] effects->mouseChanged\n";
-
+    //std::cout << "[KwinMouseProvider][debug] effects->mouseChanged\n";
     return true;
 }
-
-
-void KwinMouseProvider::setCallback(Callback callback)
-{
+void KwinMouseProvider::setCallback(Callback callback){
     callback_ = std::move(callback);
 }
-
 
 void KwinMouseProvider::slotMouseChanged(
     const QPointF& pos,
@@ -45,13 +34,13 @@ void KwinMouseProvider::slotMouseChanged(
     Qt::KeyboardModifiers
 )
 {
-    if(!callback_)
-        return;
+    if(!callback_) return;
 
     UltralightWebCursorM::MousePoint pt;
 
     pt.x = static_cast<int>(pos.x());
     pt.y = static_cast<int>(pos.y());
+    /*
         std::cout
         << "[KwinMouseProvider][debug] mouseChanged "
         << "x="
@@ -61,6 +50,7 @@ void KwinMouseProvider::slotMouseChanged(
         << " left="
         << buttons.testFlag(Qt::LeftButton)
         << "\n";
+    */
     pt.pressed = buttons.testFlag(Qt::LeftButton);
 
     callback_(pt);

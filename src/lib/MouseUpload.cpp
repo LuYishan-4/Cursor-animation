@@ -29,19 +29,12 @@ public:
     {
         display_ = XOpenDisplay(nullptr);
 
-        if(!display_)
-        {
-            std::cerr
-                << "[MouseUploader/KDE]  X server "
-                << "(檢查 XWayland 是否啟用 DISPLAY )\n";
-
-            return false;
-        }
+        if(!display_) return false;
+        
 
         screen_ = DefaultScreen(display_);
         root_ = RootWindow(display_, screen_);
 
-        std::cout << "[MouseUploader/KDE]  X server OK\n";
 
         return true;
     }

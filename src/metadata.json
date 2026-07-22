@@ -1,11 +1,10 @@
 {
     "KPlugin": {
+        "Name": "Ultralightcursor",
+        "Description": "customsize your cursor",
         "Id": "ultralightcursor",
-        "Name": "Ultralight Cursor",
-        "Description": "HTML based cursor",
-        "License": "GPL"
-    },
-    "X-KDE-ServiceTypes": [
-        "KWin/Effect"
-    ]
+        "Version": "1.0.0",
+        "License": "MIT",
+        "Website": "https://github.com/LuYishan-4/Cursor-animation/"
+     }
 }
