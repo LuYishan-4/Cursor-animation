@@ -2,6 +2,8 @@
 
 #include <string>
 #include <unordered_map>
+#include <filesystem>
+
 
 namespace UltralightWebCursorM
 {

@@ -15,7 +15,8 @@ fs::path g_htmlInitialPath;
 
 namespace UltralightWebCursorM
 {
-
+    fs::path g_sdkInitialPath;
+    fs::path g_htmlInitialPath;
 
 UserConfig::UserConfig(){
     const char* home = std::getenv("HOME");
@@ -39,6 +40,7 @@ bool UserConfig::load(){
         //inital start config
         data_["html"] = g_htmlInitialPath.string();
         data_["sdk"]  =  g_sdkInitialPath.string();
+
         
         return save();
     }

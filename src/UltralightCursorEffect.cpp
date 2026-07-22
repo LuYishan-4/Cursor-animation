@@ -169,6 +169,9 @@ QDBusConnection::sessionBus().registerObject(
             region,
             screen
         );
+
+        if (screen && !screen->geometry().contains(effects->cursorPos().toPoint())) return;
+        
         GLTexture* texture =ensureCursorTexture();
         if(!texture){
             effects->addRepaintFull();
@@ -182,7 +185,7 @@ QDBusConnection::sessionBus().registerObject(
             h/2.0
         );
 
-        QPointF pos =effects->cursorPos() - hotspot;
+        QPointF pos =effects->cursorPos() - screen->geometry().topLeft() - hotspot;
          auto scale =  viewport.scale();
 
         ShaderBinder binder(

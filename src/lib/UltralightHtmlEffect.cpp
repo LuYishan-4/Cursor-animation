@@ -57,7 +57,7 @@ bool UltralightHtmlEffect::initialize( const std::string& path,const std::string
     html_path_ = path;
     if(!view_)return false;
 
-    listener_ =std::make_unique<LocalLoadListener>(is_loaded_);
+    listener_ =std::make_unique<LocalLoadListener>(&is_loaded_);
 
     view_->set_load_listener(listener_.get());
 

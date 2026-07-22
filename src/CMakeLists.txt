@@ -3,27 +3,15 @@ kcoreaddons_add_plugin(
     INSTALL_NAMESPACE "kwin/effects/plugins"
 )
 
-target_sources(ultralightcursor PRIVATE
-    lib/header/UltralightCursorEffect.hpp
-    UltralightCursorEffect.cpp
-
-
-    lib/UltralightHtmlEffect.cpp
-    lib/header/UltralightHtmlEffect.hpp
-
-    lib/KwinMouseProvider.cpp
-    lib/header/KwinMouseProvider.hpp
-    lib/Quick/PluginPath/PluginPath.hpp
-    lib/Quick/PluginPath/PluginPath.cpp
-
-    lib/UserConfig.cpp
-    lib/header/UserConfig.hpp
-    lib/header/MouseProvider.hpp
+file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS 
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/*.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/*.hpp"
 )
 
-
-
-
+target_sources(ultralightcursor PRIVATE
+    UltralightCursorEffect.cpp
+    ${LIB_SOURCES}
+)
 target_include_directories(ultralightcursor
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/lib/header

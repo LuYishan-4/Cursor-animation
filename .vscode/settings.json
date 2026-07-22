@@ -127,6 +127,8 @@
         "qmainwindow": "cpp",
         "filesystem": "cpp",
         "*.inc": "cpp",
-        "qobject": "cpp"
+        "qobject": "cpp",
+        "version": "cpp",
+        "__target_macros": "cpp"
     }
 }
