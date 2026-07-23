@@ -22,11 +22,6 @@ public:
     UserConfig();
 
     /**
-     * @brief Default destructor.
-     */
-    ~UserConfig() = default;
-
-    /**
      * @brief Loads the configuration file. If the file does not exist, 
      *        it automatically initializes with default parameters and saves it.
      * @return true if loading or initialization succeeds; false otherwise.

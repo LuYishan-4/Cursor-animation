@@ -36,12 +36,21 @@ UltralightCursorEffect::UltralightCursorEffect()
         std::make_unique<
             UltralightWebCursorM::UltralightHtmlEffect
         >();
+    qDebug() << "[UltralightCursorEffect] htmldone";
     UltralightWebCursorM::UserConfig config;
+    qDebug() << "[UltralightCursorEffect] configdone";
     config.load();
     auto html = config.readKeyValue("html");
     auto sdk = config.readKeyValue("sdk");
-    int width = std::stoi(config.readKeyValue("width"));
-    int height = std::stoi(config.readKeyValue("height"));
+    auto widthStr = config.readKeyValue("width");
+    auto heightStr = config.readKeyValue("height");
+
+    qDebug() << "width =" << QString::fromStdString(widthStr);
+    qDebug() << "height =" << QString::fromStdString(heightStr);
+
+    int width = std::stoi(widthStr);
+    int height = std::stoi(heightStr);
+    qDebug() << "[UltralightCursorEffect] conficccccc";
     //auto blacklist = config.getBlacklist();
     //m_blacklist.setBlacklist(config.getBlacklist());
 
@@ -64,7 +73,7 @@ UltralightCursorEffect::UltralightCursorEffect()
     }
 
     m_mouseProvider =std::make_unique<KwinMouseProvider>();
-
+    qDebug() << "[UltralightCursorEffect] gggggggggggggg";
     m_mouseProvider->setCallback([this](const UltralightWebCursorM::MousePoint& pt){
         if(!m_html)return;
         m_cursorPoint =
@@ -83,7 +92,7 @@ UltralightCursorEffect::UltralightCursorEffect()
 );
 
 m_mouseProvider->initialize();
-
+    qDebug() << "[UltralightCursorEffect] codsfsfsfsfsfsfsfscc";
     QDBusConnection::sessionBus().registerObject(
         QStringLiteral("/UltralightCursor"),
         this,

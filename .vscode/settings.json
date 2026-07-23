@@ -129,6 +129,7 @@
         "*.inc": "cpp",
         "qobject": "cpp",
         "version": "cpp",
-        "__target_macros": "cpp"
+        "__target_macros": "cpp",
+        "qdbusconnection": "cpp"
     }
 }

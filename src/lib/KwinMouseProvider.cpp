@@ -1,7 +1,7 @@
 #include "header/KwinMouseProvider.hpp"
 
 #include "effect/effecthandler.h"
-
+#include <QDBusConnection>
 #include <iostream>
 
 
@@ -40,17 +40,13 @@ void KwinMouseProvider::slotMouseChanged(
 
     pt.x = static_cast<int>(pos.x());
     pt.y = static_cast<int>(pos.y());
-    /*
-        std::cout
-        << "[KwinMouseProvider][debug] mouseChanged "
-        << "x="
-        << pos.x()
-        << " y="
-        << pos.y()
-        << " left="
-        << buttons.testFlag(Qt::LeftButton)
-        << "\n";
-    */
+    
+     qDebug()
+    << "[KwinMouseProvider][debug] mouseChanged"
+    << "x =" << pos.x()
+    << "y =" << pos.y()
+    << "left =" << buttons.testFlag(Qt::LeftButton);
+    
     pt.pressed = buttons.testFlag(Qt::LeftButton);
 
     callback_(pt);

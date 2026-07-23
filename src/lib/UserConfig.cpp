@@ -21,7 +21,7 @@ namespace UltralightWebCursorM
 
 UserConfig::UserConfig(){
     const char* home = std::getenv("HOME");
-    if(home)configPath_ = std::string(home) + "/.config/cursorfx/config.ini";
+    if(home)configPath_ = std::string(home) + "/.config/ultralightwebcursor/config.ini";
 }
 
 bool UserConfig::load(){

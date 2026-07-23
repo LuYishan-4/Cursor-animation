@@ -10,7 +10,7 @@ std::filesystem::path PluginPath::dataDir()
     QString path =
         QStandardPaths::locate(
             QStandardPaths::GenericDataLocation,
-            QStringLiteral("kwin/effects/ultralightcursor"),
+            QStringLiteral("kwin/effects/ultralightwebcursor"),
             QStandardPaths::LocateDirectory
         );
 

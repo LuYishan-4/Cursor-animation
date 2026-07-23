@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
-
+#include <QDBusConnection>
 
 namespace UltralightWebCursorM
 {
@@ -22,9 +22,9 @@ UltralightHtmlEffect::~UltralightHtmlEffect(){
 
 
 //initialize
-bool UltralightHtmlEffect::initialize( const std::string& path,const std::string& sdk,const int&  width,const int&  height){
-    width_ = width;
-    height_ = height;
+bool UltralightHtmlEffect::initialize( const std::string& path,const std::string& sdk,const int&  w,const int&  h){
+    width_ = w;
+    height_ = h;
     ultralight::Config config;
     config.resource_path_prefix =
         ultralight::String(
@@ -35,6 +35,8 @@ bool UltralightHtmlEffect::initialize( const std::string& path,const std::string
     platform.set_font_loader(
         ultralight::GetPlatformFontLoader()
     );
+    qDebug() << "initialize:" << w<< h;
+    qDebug() << "initializesdk:" << sdk.c_str();
 
     platform.set_file_system(
         ultralight::GetPlatformFileSystem(
@@ -56,7 +58,7 @@ bool UltralightHtmlEffect::initialize( const std::string& path,const std::string
             vc,
             nullptr
         );
-    std::cout<<"[Ultralight]"<<width_<<"\n";
+    qDebug() << "[UltralightCursorEffect] width done";
     html_path_ = path;
     if(!view_)return false;
 
@@ -65,7 +67,7 @@ bool UltralightHtmlEffect::initialize( const std::string& path,const std::string
     view_->set_load_listener(listener_.get());
 
     if(std::filesystem::exists(html_path_ )) html_time_ =std::filesystem::last_write_time(html_path_ );
-    
+    qDebug() << "[UltralightCursorEffect] c14242";
     return load(path);
 }
 
@@ -81,7 +83,7 @@ bool UltralightHtmlEffect::load(const std::string& path){
 
     std::filesystem::path p(path);
 
-    std::string base ="file://" +p.parent_path().string()+"/";
+    std::string base ="file://" +p.parent_path().string()+"/"+"index.html";
 
     is_loaded_ = false;
 
