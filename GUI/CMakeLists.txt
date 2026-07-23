@@ -78,12 +78,12 @@ install(
     TARGETS UltralightWebCursor-GUI
 
     RUNTIME DESTINATION
-    "$ENV{HOME}/.local/bin"
+    ${CMAKE_INSTALL_BINDIR}
 )
 
 
-set(CURSORFX_SETTINGS_BIN
-    "$ENV{HOME}/.local/bin/UltralightWebCursor-GUI"
+set(UltralightWebCursor-GUI
+     "${CMAKE_INSTALL_FULL_BINDIR}/UltralightWebCursor-GUI"
 )
 
 
@@ -101,5 +101,5 @@ install(
     "${CMAKE_CURRENT_BINARY_DIR}/UltralightWebCursor-GUI.desktop"
 
     DESTINATION
-    "$ENV{HOME}/.local/share/applications"
+     ${CMAKE_INSTALL_DATADIR}/applications
 )
