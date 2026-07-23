@@ -82,8 +82,8 @@ install(
 )
 
 
-set(UltralightWebCursor-GUI
-     "${CMAKE_INSTALL_FULL_BINDIR}/UltralightWebCursor-GUI"
+set(APP_EXECUTABLE
+    "${CMAKE_INSTALL_FULL_BINDIR}/UltralightWebCursor-GUI"
 )
 
 
