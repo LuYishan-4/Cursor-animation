@@ -43,6 +43,7 @@ find_package(KF6 REQUIRED COMPONENTS
     ConfigWidgets
     KCMUtils
     I18n
+    Auth
 )
 
 

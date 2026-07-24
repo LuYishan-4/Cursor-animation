@@ -3,7 +3,6 @@
 #include <QFileInfo>
 #include <QDesktopServices>
 #include <QUrl>
-
 #include <QDBusInterface>
 #include <QDBusConnection>
 #include <QDBusMessage>

@@ -19,7 +19,6 @@ kcmutils_add_qml_kcm(kcm_ultralightwebcursor)
 target_sources(kcm_ultralightwebcursor PRIVATE
        main_settings.cpp
        main_settings.hpp
-
         SettingsBackend.cpp
         SettingsBackend.hpp
         ${CMAKE_SOURCE_DIR}/src/lib/UserConfig.cpp
@@ -58,7 +57,10 @@ target_link_libraries(
     KF6::ConfigWidgets
     KF6::KCMUtils
     KF6::I18n
-
+)
+kauth_install_actions(
+    org.kde.ultralightwebcursor
+    org.kde.ultralightwebcursor.actions
 )
 install(
     FILES kcm_ultralightwebcursor.json

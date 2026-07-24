@@ -131,6 +131,10 @@
         "version": "cpp",
         "__target_macros": "cpp",
         "qdbusconnection": "cpp",
-        "qqmlcontext": "cpp"
+        "qqmlcontext": "cpp",
+        "target": "cpp",
+        "__functional_03": "cpp",
+        "qdbusinterface": "cpp",
+        "qdesktopservices": "cpp"
     }
 }

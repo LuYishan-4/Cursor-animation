@@ -164,33 +164,83 @@ void UserConfig::removeBlacklist(const std::string& app){
     data_["blacklist"] = new_value;
     save();
 }
-bool UserConfig::uploadTheme(const std::string& path, const std::string& themeName){
+bool UserConfig::uploadTheme(const std::string& path,const std::string& themeName){
     std::error_code ec;
     fs::path src(path);
-    if(!fs::exists(src, ec) || ec) return false;
-    if(!fs::is_directory(src, ec) || ec)    return false;
+    if (!fs::exists(src, ec) || ec){
+        qDebug() << "src not exists:"
+                 << ec.message().c_str();
+        return false;
+    }
+
+    if (!fs::is_directory(src, ec) || ec)
+    {
+        qDebug() << "src is not directory:"
+                 << ec.message().c_str();
+        return false;
+    }
+
     fs::path dst =
         g_sdkInitialPath /
         "resources" /
         themeName;
-    qDebug() << "uploadTheme dst =" <<dst.string();
-    qDebug() << "uploadTheme  themename =" <<themeName;
+
+
+    qDebug() << "uploadTheme dst ="
+             << dst.string().c_str();
+
     fs::remove_all(dst, ec);
-    ec.clear();
+    if (ec){
+        qDebug() << "remove old theme failed:"
+                 << ec.message().c_str();
+        return false;
+    }
     fs::create_directories(dst, ec);
-    if(ec)  return false;
-    for(const auto& entry : fs::directory_iterator(src, ec)){
-        if(ec) return false;
-        fs::path target =dst / entry.path().filename();
+    if (ec){
+        qDebug() << "create directory failed:"
+                 << ec.message().c_str();
+        return false;
+    }
+    qDebug() << "dst exists ="
+             << fs::exists(dst);
+    fs::directory_iterator it(src, ec);
+    if (ec){
+        qDebug() << "iterator failed:"
+                 << ec.message().c_str();
+        return false;
+    }
+    for (; it != fs::directory_iterator(); it.increment(ec)){
+        if (ec){
+            qDebug() << "iterator increment failed:"
+                     << ec.message().c_str();
+            return false;
+        }
+        fs::path sourceFile = it->path();
+
+        fs::path targetFile =
+            dst / sourceFile.filename();
+        qDebug() << "copy:"
+                 << sourceFile.string().c_str()
+                 << "->"
+                 << targetFile.string().c_str();
         fs::copy(
-            entry.path(),
-            target,
+            sourceFile,
+            targetFile,
             fs::copy_options::recursive |
             fs::copy_options::overwrite_existing,
             ec
         );
-        if(ec)   return false;
+        if (ec){
+            qDebug() << "copy failed:"
+                     << ec.message().c_str();
+            qDebug() << "from:"
+                     << sourceFile.string().c_str();
+            qDebug() << "to:"
+                     << targetFile.string().c_str();
+            return false;
+        }
     }
+    qDebug() << "uploadTheme success";
     return true;
 }
 void UserConfig::setTheme( const std::string& themeName){
