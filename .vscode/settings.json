@@ -135,6 +135,7 @@
         "target": "cpp",
         "__functional_03": "cpp",
         "qdbusinterface": "cpp",
-        "qdesktopservices": "cpp"
+        "qdesktopservices": "cpp",
+        "qstandardpaths": "cpp"
     }
 }

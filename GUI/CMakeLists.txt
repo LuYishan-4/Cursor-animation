@@ -58,10 +58,6 @@ target_link_libraries(
     KF6::KCMUtils
     KF6::I18n
 )
-kauth_install_actions(
-    org.kde.ultralightwebcursor
-    org.kde.ultralightwebcursor.actions
-)
 install(
     FILES kcm_ultralightwebcursor.json
     DESTINATION ${CMAKE_INSTALL_DATADIR}/kservices6
