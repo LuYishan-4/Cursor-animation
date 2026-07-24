@@ -44,6 +44,7 @@ bool UserConfig::load(){
         data_["blacklist"] = "";
         data_["width"] = "128";
         data_["height"] = "128";
+        data_["enabled"] = "true";
         return save();
     }
  
@@ -187,10 +188,7 @@ bool UserConfig::uploadTheme(const std::string& path,const std::string& themeNam
     if(ec)return false;
     return true;
 }
-void UserConfig::setTheme(
-    const std::string& themeName
-)
-{
+void UserConfig::setTheme( const std::string& themeName){
     data_["html"] =
         (
             g_htmlInitialPath /

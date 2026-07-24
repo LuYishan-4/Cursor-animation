@@ -45,7 +45,9 @@ public:
     );
 
 
-    void reload();
+    void reload(const std::string& path,
+        const std::string& perpath,
+        const int&  width,const int&  height);
 
 
 

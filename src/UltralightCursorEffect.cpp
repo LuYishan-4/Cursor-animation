@@ -30,7 +30,7 @@ KWIN_EFFECT_FACTORY_SUPPORTED(
 
 UltralightCursorEffect::UltralightCursorEffect()
 {
-    
+
     qDebug() << "[UltralightCursorEffect] constructor";
     m_html =
         std::make_unique<
@@ -121,22 +121,33 @@ m_mouseProvider->initialize();
 
     void UltralightCursorEffect::disable(){
         if(!m_html)return;
-
         m_html->setEnabled(false);
-
         m_cursorTexture.reset();
-
         effects->addRepaintFull();
-
     }
     void UltralightCursorEffect::reloadHtml(){
-
+        UltralightWebCursorM::UserConfig config;
+       config.load();
+        auto html = config.readKeyValue("html");
+      auto sdk = config.readKeyValue("sdk");
+       auto widthStr = config.readKeyValue("width");
+       auto heightStr = config.readKeyValue("height");
+       int width = std::stoi(widthStr);
+       int height = std::stoi(heightStr);
         if(!m_html)   return;
-        m_html->reload();
-
+        m_html->reload(html,sdk,width,height);
         effects->addRepaintFull();
 
     }
+    void UltralightCursorEffect::reconfigure(ReconfigureFlags flags)
+{
+    Q_UNUSED(flags)
+ 
+    std::cout << "[UltralightCursorEffect][debug] reconfigure() 被呼叫，重新讀取設定\n";
+ 
+
+    effects->addRepaintFull();
+}
     bool UltralightCursorEffect::isBlacklisted() const {
          auto window = effects->activeWindow();
           if(!window) return false;

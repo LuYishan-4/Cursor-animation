@@ -31,12 +31,18 @@ find_package(Qt6 6.6 REQUIRED COMPONENTS
     Gui
     DBus
     Widgets
+    Qml
+    Quick
+    QuickControls2
 )
 
 
 find_package(KF6 REQUIRED COMPONENTS
     CoreAddons
     Config
+    ConfigWidgets
+    KCMUtils
+    I18n
 )
 
 
@@ -186,9 +192,9 @@ set(
 # Build targets
 #
 
-add_subdirectory(GUI)
-add_subdirectory(src)
 
+add_subdirectory(src)
+add_subdirectory(GUI)
 
 
 #

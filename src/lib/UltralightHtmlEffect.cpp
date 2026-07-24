@@ -101,22 +101,13 @@ bool UltralightHtmlEffect::load(const std::string& path){
     return true;
 }
 
-void UltralightHtmlEffect::reload(){
-    if(html_path_.empty())return;
-    if(width_ > 1920 || height_ > 1080)return;
-
-    if(!std::filesystem::exists(html_path_))return;
-
-
-    auto now =std::filesystem::last_write_time( html_path_);
-
-    if(now != html_time_){
-        html_time_ = now;
-        load(
-            html_path_.string()
-        );
-    }
+void UltralightHtmlEffect::reload(const std::string& path,  const std::string& perpath,const int&  width,const int&  height){
+       listener_.reset();
+        view_ = nullptr;
+        renderer_ = nullptr;
+        initialize(path,perpath,width,height);
 }
+
 void UltralightHtmlEffect::move( int x, int y,bool pressed){
     if(!view_)return;
     
@@ -145,7 +136,6 @@ void UltralightHtmlEffect::move( int x, int y,bool pressed){
 void UltralightHtmlEffect::update(){
     if(!enabled_)return;
     if(!renderer_ || !view_)return;
-    reload();
     renderer_->Update();
     view_->set_needs_paint(true);
     renderer_->Render();

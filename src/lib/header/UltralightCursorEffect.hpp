@@ -62,7 +62,7 @@ public:
         return 99;
     }
 
-
+     void reconfigure(ReconfigureFlags flags) override;
 
     static bool supported();
 
@@ -89,12 +89,12 @@ private:
     void showCursor();
 
 
+
     GLTexture* ensureCursorTexture();
 
 
 private:
 
-     std::unique_ptr<UltralightWebCursorM::UserConfig> m_config;
 
     std::unique_ptr<UltralightWebCursorM::UltralightHtmlEffect> m_html;
 
@@ -110,6 +110,7 @@ private:
 
 
     bool m_isMouseHidden = false;
+
 
 
     QPointF m_cursorPoint;
