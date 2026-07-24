@@ -15,21 +15,20 @@ kcmutils_add_qml_kcm(
 
         SettingsBackend.cpp
         SettingsBackend.hpp
+        ${CMAKE_SOURCE_DIR}/src/lib/UserConfig.cpp
+        ${CMAKE_SOURCE_DIR}/src/lib/header/UserConfig.hpp
+        ${CMAKE_SOURCE_DIR}/src/lib/Quick/PluginPath/PluginPath.cpp
+        ${CMAKE_SOURCE_DIR}/src/lib/Quick/PluginPath/PluginPath.hpp
+
 
 )
 
 
 
 target_include_directories(
-
     kcm_ultralightwebcursor
-
     PRIVATE
-
     ${CMAKE_CURRENT_SOURCE_DIR}
-
-    ${CMAKE_SOURCE_DIR}/src/lib/header
-
 )
 
 

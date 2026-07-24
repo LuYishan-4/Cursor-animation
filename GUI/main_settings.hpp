@@ -15,8 +15,7 @@ public:
 
     UIKCM(
         QObject* parent,
-        const KPluginMetaData& metaData,
-        const QVariantList& args
+        const KPluginMetaData& metaData
     );
 
     ~UIKCM() override;

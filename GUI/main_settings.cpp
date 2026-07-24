@@ -9,23 +9,19 @@
 
 
 
-K_PLUGIN_CLASS_WITH_JSON(UIKCM, "metadata.json")
+K_PLUGIN_CLASS_WITH_JSON(UIKCM, "kcm_ultralightwebcursor.json")
 
 UIKCM::UIKCM(
     QObject* parent,
-    const KPluginMetaData& metaData,
-    const QVariantList& args
+    const KPluginMetaData& metaData
 )
-    : KQuickConfigModule(parent, metaData, args)
+    : KQuickConfigModule(parent, metaData)
 {
-    Q_UNUSED(args)
+ 
 
     m_backend = new SettingsBackend(this);
 
-    qmlEngine()->rootContext()->setContextProperty(
-        QStringLiteral("backend"),
-        m_backend
-    );
+ 
 
     setButtons(Apply | Default);
 
