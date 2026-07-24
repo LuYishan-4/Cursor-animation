@@ -30,7 +30,10 @@ UIKCM::UIKCM(
 
 
 UIKCM::~UIKCM() = default;
-
+QObject* UIKCM::backend() const
+{
+    return m_backend;
+}
 
 void UIKCM::load()
 {

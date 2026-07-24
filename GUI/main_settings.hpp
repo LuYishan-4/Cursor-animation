@@ -11,6 +11,12 @@ class UIKCM : public KQuickConfigModule
 {
     Q_OBJECT
 
+       Q_PROPERTY(
+        QObject* backend
+        READ backend
+        CONSTANT
+    )
+
 public:
 
     UIKCM(
@@ -19,7 +25,7 @@ public:
     );
 
     ~UIKCM() override;
-
+    QObject* backend() const;
 
     void load() override;
 

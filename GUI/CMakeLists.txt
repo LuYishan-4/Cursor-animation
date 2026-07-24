@@ -2,7 +2,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 
-
+include(KDEInstallDirs)
+include(KDECMakeSettings)
 kcmutils_add_qml_kcm(
 
     kcm_ultralightwebcursor
@@ -54,4 +55,8 @@ target_link_libraries(
     KF6::KCMUtils
     KF6::I18n
 
+)
+install(
+    FILES kcm_ultralightwebcursor.json
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/kservices6
 )
